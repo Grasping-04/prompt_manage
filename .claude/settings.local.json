@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(dir:*)",
+      "Bash(cmd /c \"cd /d E:\\00-UT\\大四第一学期\\prompt_manage\\temp-project && for %f in (*) do move /Y \"\"%f\"\" .. && for /d %d in (*) do move /Y \"\"%d\"\" ..\")",
+      "Bash(powershell -Command:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)"
+    ]
+  }
+}
