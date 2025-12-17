@@ -153,6 +153,121 @@ npm run deploy
 3. 选择 GitHub 仓库
 4. 构建设置保持默认，点击 `Deploy site`
 
+### Cloudflare Pages（推荐国内用户）
+
+Cloudflare Pages 在国内访问速度较好，且完全免费。
+
+#### 1. 注册/登录 Cloudflare
+
+1. 访问 [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. 注册或登录账号
+
+#### 2. 创建 Pages 项目
+
+1. 在左侧菜单点击 `Workers 和 Pages`
+2. 点击 `创建` 按钮
+3. 选择 `Pages` 标签页
+4. 点击 `连接到 Git`
+
+#### 3. 连接 GitHub 仓库
+
+1. 首次使用需授权 Cloudflare 访问你的 GitHub
+2. 选择你的 `prompt-manager` 仓库
+3. 点击 `开始设置`
+
+#### 4. 配置构建设置
+
+| 配置项    | 值                      |
+| ------ | ---------------------- |
+| 项目名称   | `prompt-manager`（可自定义） |
+| 生产分支   | `main`                 |
+| 构建命令   | `npm run build`        |
+| 构建输出目录 | `dist`                 |
+
+#### 5. 部署
+
+1. 点击 `保存并部署`
+2. 等待构建完成（通常 1-2 分钟）
+3. 部署成功后获得访问链接：`https://<project-name>.pages.dev`
+
+#### 6. 后续更新
+
+每次 push 代码到 GitHub，Cloudflare Pages 会自动重新部署。
+
+#### 7. 自定义域名（可选）
+
+1. 在项目页面点击 `自定义域`
+2. 输入你的域名
+3. 按提示配置 DNS（CNAME 指向 `<project-name>.pages.dev`）
+
+---
+
+### 腾讯云 Webify（国内备选方案）
+
+腾讯云 Webify 是国内平台，访问速度快，有免费额度。
+
+#### 1. 注册/登录腾讯云
+
+1. 访问 [腾讯云 Webify](https://cloud.tencent.com/product/webify)
+2. 使用微信或 QQ 登录腾讯云账号
+3. 完成实名认证（国内平台必需）
+
+#### 2. 创建应用
+
+1. 进入 [Webify 控制台](https://console.cloud.tencent.com/webify)
+2. 点击 `新建应用`
+3. 选择 `从 Git 仓库导入`
+
+#### 3. 连接代码仓库
+
+**方式一：GitHub（推荐）**
+
+1. 点击 `GitHub` 并授权
+2. 选择你的仓库
+
+**方式二：Gitee**
+
+1. 先将代码同步到 Gitee
+2. 点击 `Gitee` 并授权
+
+**方式三：腾讯云 Coding**
+
+1. 使用腾讯云 Coding 托管代码
+2. 直接选择仓库
+
+#### 4. 配置构建设置
+
+| 配置项  | 值               |
+| ---- | --------------- |
+| 框架预设 | `Vite`          |
+| 构建命令 | `npm run build` |
+| 输出目录 | `dist`          |
+| 安装命令 | `npm install`   |
+
+#### 5. 部署
+
+1. 点击 `部署`
+2. 等待构建完成
+3. 获得访问链接：`https://<app-id>.web.cloudbase.net`
+
+#### 6. 绑定自定义域名（可选，需备案）
+
+1. 在应用详情页点击 `域名管理`
+2. 添加已备案的域名
+3. 配置 CNAME 解析到腾讯云提供的地址
+
+#### 7. 免费额度说明
+
+| 资源     | 免费额度     |
+| ------ | -------- |
+| 存储     | 1GB      |
+| CDN 流量 | 5GB/月    |
+| 构建时长   | 500 分钟/月 |
+
+对于个人项目通常足够使用。
+
+---
+
 ### 自有服务器（Nginx）
 
 1. 构建项目：
