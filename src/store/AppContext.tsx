@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react'
-import type { StorageData, Task, Project, PromptTemplate, FilterOptions } from '../types'
+import type { StorageData, Task, Project, PromptTemplate, FilterOptions, ThemeMode, ColorTheme } from '../types'
 import {
   loadData,
   saveData,
@@ -28,7 +28,8 @@ type Action =
   | { type: 'UPDATE_TEMPLATE'; payload: { id: string; updates: Partial<PromptTemplate> } }
   | { type: 'DELETE_TEMPLATE'; payload: string }
   | { type: 'SET_ACTIVE_PROJECT'; payload: string | null }
-  | { type: 'SET_THEME'; payload: 'light' | 'dark' | 'system' }
+  | { type: 'SET_THEME_MODE'; payload: ThemeMode }
+  | { type: 'SET_COLOR_THEME'; payload: ColorTheme }
   | { type: 'IMPORT_DATA'; payload: StorageData }
 
 // Reducer
@@ -71,8 +72,11 @@ function reducer(state: StorageData, action: Action): StorageData {
     case 'SET_ACTIVE_PROJECT':
       return { ...state, settings: { ...state.settings, activeProjectId: action.payload } }
 
-    case 'SET_THEME':
-      return { ...state, settings: { ...state.settings, theme: action.payload } }
+    case 'SET_THEME_MODE':
+      return { ...state, settings: { ...state.settings, themeMode: action.payload } }
+
+    case 'SET_COLOR_THEME':
+      return { ...state, settings: { ...state.settings, colorTheme: action.payload } }
 
     default:
       return state
@@ -87,6 +91,7 @@ interface AppContextType {
   updateTask: (id: string, updates: Partial<Task>) => void
   deleteTask: (id: string) => void
   completeTask: (id: string) => void
+  setTaskStatus: (id: string, status: Task['status']) => void
   reorderTasks: (tasks: Task[]) => void
   // Project actions
   addProject: (project: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => void
@@ -98,7 +103,8 @@ interface AppContextType {
   updateTemplate: (id: string, updates: Partial<PromptTemplate>) => void
   deleteTemplate: (id: string) => void
   // Settings
-  setTheme: (theme: 'light' | 'dark' | 'system') => void
+  setThemeMode: (mode: ThemeMode) => void
+  setColorTheme: (theme: ColorTheme) => void
   // Data operations
   importData: (data: StorageData) => void
   // Computed
@@ -114,8 +120,15 @@ const initialState: StorageData = {
   tasks: [],
   projects: [],
   templates: [],
-  settings: { theme: 'system', activeProjectId: null },
+  settings: { themeMode: 'system', colorTheme: 'blue', activeProjectId: null },
   version: 1
+}
+
+// Apply theme to document
+function applyTheme(mode: ThemeMode, colorTheme: ColorTheme) {
+  const root = document.documentElement
+  root.setAttribute('data-theme', colorTheme)
+  root.setAttribute('data-mode', mode)
 }
 
 // Provider
@@ -127,6 +140,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const data = loadData()
     dispatch({ type: 'INIT', payload: data })
   }, [])
+
+  // Apply theme when settings change
+  useEffect(() => {
+    applyTheme(state.settings.themeMode, state.settings.colorTheme)
+  }, [state.settings.themeMode, state.settings.colorTheme])
 
   // Save data on state change
   useEffect(() => {
@@ -157,6 +175,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         completedAt: task.status === 'completed' ? undefined : Date.now()
       })
     }
+  }
+
+  const setTaskStatus = (id: string, status: Task['status']) => {
+    updateTask(id, {
+      status,
+      completedAt: status === 'completed' ? Date.now() : undefined
+    })
   }
 
   const reorderTasks = (tasks: Task[]) => {
@@ -196,8 +221,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   // Settings
-  const setTheme = (theme: 'light' | 'dark' | 'system') => {
-    dispatch({ type: 'SET_THEME', payload: theme })
+  const setThemeMode = (mode: ThemeMode) => {
+    dispatch({ type: 'SET_THEME_MODE', payload: mode })
+  }
+
+  const setColorTheme = (theme: ColorTheme) => {
+    dispatch({ type: 'SET_COLOR_THEME', payload: theme })
   }
 
   // Data operations
@@ -247,6 +276,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     updateTask,
     deleteTask,
     completeTask,
+    setTaskStatus,
     reorderTasks,
     addProject,
     updateProject,
@@ -255,7 +285,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     addTemplate,
     updateTemplate,
     deleteTemplate,
-    setTheme,
+    setThemeMode,
+    setColorTheme,
     importData,
     getFilteredTasks,
     getTasksByProject,

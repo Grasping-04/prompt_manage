@@ -41,13 +41,20 @@ export interface PromptTemplate {
   updatedAt: number
 }
 
+// 主题色类型
+export type ColorTheme = 'blue' | 'purple' | 'green' | 'orange' | 'pink' | 'teal'
+
+// 明暗模式类型
+export type ThemeMode = 'light' | 'dark' | 'system'
+
 // 应用状态接口
 export interface AppState {
   tasks: Task[]
   projects: Project[]
   templates: PromptTemplate[]
   activeProjectId: string | null
-  theme: 'light' | 'dark' | 'system'
+  themeMode: ThemeMode
+  colorTheme: ColorTheme
 }
 
 // 存储数据接口
@@ -56,7 +63,8 @@ export interface StorageData {
   projects: Project[]
   templates: PromptTemplate[]
   settings: {
-    theme: 'light' | 'dark' | 'system'
+    themeMode: ThemeMode
+    colorTheme: ColorTheme
     activeProjectId: string | null
   }
   version: number // 数据版本，用于迁移

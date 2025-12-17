@@ -46,7 +46,8 @@ const defaultData: StorageData = {
     }
   ],
   settings: {
-    theme: 'system',
+    themeMode: 'system',
+    colorTheme: 'blue',
     activeProjectId: 'default'
   },
   version: CURRENT_VERSION
@@ -177,13 +178,16 @@ export function updateProject(data: StorageData, projectId: string, updates: Par
 }
 
 export function deleteProject(data: StorageData, projectId: string): StorageData {
-  // 删除项目时，将该项目下的任务移到默认项目
+  // 删除项目时，将该项目下的任务移到第一个剩余项目，如果没有则设为 undefined
+  const remainingProjects = data.projects.filter(project => project.id !== projectId)
+  const fallbackProjectId = remainingProjects.length > 0 ? remainingProjects[0].id : undefined
+
   return {
     ...data,
-    projects: data.projects.filter(project => project.id !== projectId),
+    projects: remainingProjects,
     tasks: data.tasks.map(task =>
       task.projectId === projectId
-        ? { ...task, projectId: 'default', updatedAt: Date.now() }
+        ? { ...task, projectId: fallbackProjectId, updatedAt: Date.now() }
         : task
     )
   }

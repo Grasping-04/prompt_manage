@@ -29,6 +29,9 @@ export function TaskList() {
     ? state.projects.find(p => p.id === state.settings.activeProjectId)
     : null
 
+  // 是否在"全部任务"视图中显示项目标签
+  const showProjectTag = state.settings.activeProjectId === null
+
   const handleEdit = (task: Task) => {
     setEditingTask(task)
     setIsFormOpen(true)
@@ -192,7 +195,7 @@ export function TaskList() {
           <div className="max-w-3xl mx-auto space-y-3">
             <AnimatePresence mode="popLayout">
               {tasks.map(task => (
-                <TaskItem key={task.id} task={task} onEdit={handleEdit} />
+                <TaskItem key={task.id} task={task} onEdit={handleEdit} showProjectTag={showProjectTag} />
               ))}
             </AnimatePresence>
           </div>

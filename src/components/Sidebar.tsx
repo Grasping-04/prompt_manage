@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FolderOpen, Plus, MoreHorizontal, Edit3, Trash2, Check, X } from 'lucide-react'
+import { Inbox, Plus, MoreHorizontal, Edit3, Trash2, Check, X } from 'lucide-react'
 import { useApp } from '../store/AppContext'
+import { ThemeSelector } from './ThemeSelector'
 import type { Project } from '../types'
 
 const PROJECT_COLORS = [
@@ -39,10 +40,11 @@ export function Sidebar() {
   }
 
   const handleDelete = (projectId: string) => {
-    if (projectId === 'default') return
     deleteProject(projectId)
     if (state.settings.activeProjectId === projectId) {
-      setActiveProject('default')
+      // 删除当前项目后，切换到全部任务或第一个项目
+      const remainingProjects = state.projects.filter(p => p.id !== projectId)
+      setActiveProject(remainingProjects.length > 0 ? remainingProjects[0].id : null)
     }
     setMenuOpenId(null)
   }
@@ -54,7 +56,10 @@ export function Sidebar() {
     setMenuOpenId(null)
   }
 
-  const getTaskCount = (projectId: string) => {
+  const getTaskCount = (projectId: string | null) => {
+    if (projectId === null) {
+      return state.tasks.filter(t => !t.parentId).length
+    }
     return state.tasks.filter(t => t.projectId === projectId && !t.parentId).length
   }
 
@@ -67,8 +72,30 @@ export function Sidebar() {
         </h1>
       </div>
 
-      {/* Projects */}
+      {/* Content */}
       <div className="flex-1 overflow-y-auto py-4">
+        {/* All tasks - special top level */}
+        <div className="px-2 mb-4">
+          <button
+            onClick={() => setActiveProject(null)}
+            className={`
+              w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-sm)]
+              transition-all duration-[var(--transition-fast)]
+              ${state.settings.activeProjectId === null
+                ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
+                : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]'
+              }
+            `}
+          >
+            <Inbox className="w-5 h-5" />
+            <span className="flex-1 text-left text-sm font-medium">全部任务</span>
+            <span className="text-xs text-[var(--color-text-tertiary)]">
+              {getTaskCount(null)}
+            </span>
+          </button>
+        </div>
+
+        {/* Projects section */}
         <div className="flex items-center justify-between px-4 mb-2">
           <span className="text-xs font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider">
             项目
@@ -82,26 +109,7 @@ export function Sidebar() {
         </div>
 
         <nav className="space-y-1 px-2">
-          {/* All tasks */}
-          <button
-            onClick={() => setActiveProject(null)}
-            className={`
-              w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-sm)]
-              transition-all duration-[var(--transition-fast)]
-              ${state.settings.activeProjectId === null
-                ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
-                : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]'
-              }
-            `}
-          >
-            <FolderOpen className="w-5 h-5" />
-            <span className="flex-1 text-left text-sm font-medium">全部任务</span>
-            <span className="text-xs text-[var(--color-text-tertiary)]">
-              {state.tasks.filter(t => !t.parentId).length}
-            </span>
-          </button>
-
-          {/* Project list */}
+          {/* Project list - including default project */}
           {state.projects.map(project => (
             <div key={project.id} className="relative group">
               {editingId === project.id ? (
@@ -168,17 +176,15 @@ export function Sidebar() {
                   </span>
 
                   {/* Menu button */}
-                  {project.id !== 'default' && (
-                    <div
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={e => {
-                        e.stopPropagation()
-                        setMenuOpenId(menuOpenId === project.id ? null : project.id)
-                      }}
-                    >
-                      <MoreHorizontal className="w-4 h-4" />
-                    </div>
-                  )}
+                  <div
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={e => {
+                      e.stopPropagation()
+                      setMenuOpenId(menuOpenId === project.id ? null : project.id)
+                    }}
+                  >
+                    <MoreHorizontal className="w-4 h-4" />
+                  </div>
                 </button>
               )}
 
@@ -268,7 +274,8 @@ export function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-[var(--color-border-light)]">
+      <div className="p-4 border-t border-[var(--color-border-light)] space-y-3">
+        <ThemeSelector />
         <p className="text-xs text-[var(--color-text-tertiary)] text-center">
           数据自动保存在本地
         </p>
