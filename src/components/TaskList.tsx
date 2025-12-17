@@ -8,7 +8,7 @@ import type { Task, FilterOptions } from '../types'
 import { exportData, importData } from '../services/storage'
 
 export function TaskList() {
-  const { state, getFilteredTasks, importData: importAppData } = useApp()
+  const { state, getFilteredTasks } = useApp()
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [filter, setFilter] = useState<FilterOptions>({
