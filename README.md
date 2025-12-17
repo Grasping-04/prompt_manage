@@ -31,14 +31,16 @@
 ### 方式二：手动启动
 
 1. 安装依赖：
-```bash
-npm install
-```
+   
+   ```bash
+   npm install
+   ```
 
 2. 启动开发服务器：
-```bash
-npm run dev
-```
+   
+   ```bash
+   npm run dev
+   ```
 
 3. 在浏览器中访问 http://localhost:5173
 
